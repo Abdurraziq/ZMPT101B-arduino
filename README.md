@@ -58,7 +58,7 @@ This is an example of measuring electrical power using the zmpt101b sensor for v
 
 This example code use this [ACS712 library for arduino](https://github.com/rkoptev/ACS712-arduino).
 
-```arduino
+```c++
 #include "ZMPT101B.h"
 #include "ACS712.h"
 
