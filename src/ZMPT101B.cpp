@@ -2,7 +2,7 @@
 
 ZMPT101B::ZMPT101B(uint8_t _pin) {
 	pin = _pin;
-	sensitivity = 0.001;
+	sensitivity = 0.019;
 }
 
 int ZMPT101B::calibrate() {
