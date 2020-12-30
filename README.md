@@ -17,7 +17,7 @@ Constructor has a parameters for analog input to which it is connected.
 ### **getVoltagetAC()**
 
 ```c++
-float getVoltagetAC(uint16_t frequency )
+float getVoltageAC(uint16_t frequency )
 ```
 
 This method allows you to measure AC voltage. Frequency is measured in Hz. By default frequency is set to 50 Hz. Method use the Root Mean Square technique for the measurement. The measurement itself takes time of one full period (1second / frequency). RMS method allow us to measure complex signals different from the perfect sine wave.
