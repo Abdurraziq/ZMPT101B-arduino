@@ -3,7 +3,7 @@
 ZMPT101B::ZMPT101B(uint8_t _pin)
 {
 	pin = _pin;
-	sensitivity = 0.00207;
+	sensitivity = 0.019;
 }
 
 int ZMPT101B::calibrate()
@@ -22,9 +22,9 @@ void ZMPT101B::setZeroPoint(int _zero)
 	zero = _zero;
 }
 
-void ZMPT101B::setSensitivity(float sens)
+void ZMPT101B::setSensitivity(float _sensitivity)
 {
-	sensitivity = sens;
+	sensitivity = _sensitivity;
 }
 
 int ZMPT101B::getZeroPoint()
@@ -57,18 +57,16 @@ float ZMPT101B::getVoltageAC(uint16_t frequency)
 		Vsum += Vnow * Vnow;
 		measurements_count++;
 	}
-
 	float Vrms = sqrt(Vsum / measurements_count) / ADC_SCALE * VREF / sensitivity;
 	return Vrms;
 }
 
-float ZMPT101B::calculateSensitivity(ZMPT101B sensor, float voltage)
+float ZMPT101B::calculatesSensitivity(float voltage)
 {
-	float param = 0.005;
-	while (sensor.getVoltageAC() < voltage)
+	while (this->getVoltageAC() < voltage)
 	{
-		param -= 0.0001;
-		sensor.setSensitivity(param);
+		sensitivity -= 0.0001;
+		this->setSensitivity(sensitivity);
 	}
-	return param;
+	return sensitivity;
 }
