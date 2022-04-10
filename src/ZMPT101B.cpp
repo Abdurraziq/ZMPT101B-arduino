@@ -35,11 +35,11 @@ int ZMPT101B::getZeroPoint()
 float ZMPT101B::getVoltageDC()
 {
 	int16_t acc = 0;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		acc += analogRead(pin) - zero;
 	}
-	float V = (float)acc / 10.0 / ADC_SCALE * VREF / sensitivity;
+	float V = (float)acc / 100.0 / ADC_SCALE * VREF / sensitivity;
 	return V;
 }
 
