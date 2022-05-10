@@ -20,7 +20,7 @@ Constructor has a parameters for analog input to which it is connected.
 float getVoltageAC(uint16_t frequency )
 ```
 
-This method allows you to measure AC voltage. Frequency is measured in Hz. By default frequency is set to 50 Hz. Method use the Root Mean Square technique for the measurement. The measurement itself takes time of one full period (1second / frequency). RMS method allow us to measure complex signals different from the perfect sine wave.
+This method allows you to measure AC voltage. Frequency is measured in Hz. By default frequency is set to 50 Hz. Method use the Root Mean Square technique for the measurement. The measurement itself takes time of one full period (1second / frequency). True RMS method allow us to measure complex signals different from the perfect sine wave.
 
 ### **calibrate()**
 
@@ -28,7 +28,7 @@ This method allows you to measure AC voltage. Frequency is measured in Hz. By de
 int calibrate()
 ```
 
-This method reads the current value of the sensor and sets it as a reference point of measurement, and then returns this value. By default, this parameter is equal to half of the maximum value on analog input - 512; however, sometimes this value may vary. It depends on the individual sensor, power issues etc… It is better to execute this method at the beginning of each program. Note that when performing this method, no current must flow through the sensor, and since this is not always possible - there is the following method:
+This method reads the current value of the sensor and sets it as a reference point of measurement, and then returns this value. By default, this parameter is equal to half of the maximum value on analog input - 512 or 2048 for 12-bit ADC (ESP32); however, sometimes this value may vary. It depends on the individual sensor, power issues etc… It is better to execute this method at the beginning of each program. Note that when performing this method, no current must flow through the sensor, and since this is not always possible - there is the following method:
 
 ### **setZeroPoint()**
 
@@ -44,7 +44,15 @@ This method sets the obtained value as a zero point for measurements. You can us
 void setSensitivity( float sens )
 ```
 
-This method sets the sensitivity value of the sensor. This sensitivity value indicates how much the output voltage value read by the ADC is compared to the value of the measured voltage source. The default value is 0.001.
+This method sets the sensitivity value of the sensor. This sensitivity value indicates how much the output voltage value read by the ADC is compared to the value of the measured voltage source. The default value is 0.019.
+
+### **calculatesSensitivity()**
+
+```c++
+float calculatesSensitivity(float voltage)
+```
+
+This method calculates a value for the sensitivity if the applied voltage to the sensor is known.
 
 ## Example
 
@@ -77,7 +85,12 @@ void setup()
   // Ensure that no current flows through the sensor at this moment
   Serial.println("Calibrating... Ensure that no current flows through the sensor at this moment");
   delay(100);
+  
   voltageSensor.calibrate();
+  // Calculates sensitivity for 220V
+  Serial.print("Sensitivity= ");
+  Serial.println(voltageSensor.calculatesSensitivity(220.0), 8);
+
   currentSensor.calibrate();
   Serial.println("Done!");
 }

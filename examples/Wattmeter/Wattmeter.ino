@@ -24,7 +24,12 @@ void setup()
   // If you are not sure that the current through the sensor will not leak during calibration - comment out this method
   Serial.println("Calibrating... Ensure that no current flows through the sensor at this moment");
   delay(100);
+  
   voltageSensor.calibrate();
+   // Calculates sensitivity for 220V
+  Serial.print("Sensitivity= ");
+  Serial.println(voltageSensor.calculatesSensitivity(220.0), 8);
+
   currentSensor.calibrate();
   Serial.println("Done!");
 }
