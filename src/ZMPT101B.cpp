@@ -22,15 +22,6 @@ void ZMPT101B::setSensitivity(float sens) {
 	sensitivity = sens;
 }
 
-float ZMPT101B::getVoltageDC() {
-	int16_t acc = 0;
-	for (int i = 0; i < 10; i++) {
-		acc += analogRead(pin) - zero;
-	}
-	float V = (float)acc / 10.0 / ADC_SCALE * VREF / sensitivity;
-	return V;
-}
-
 float ZMPT101B::getVoltageAC(uint16_t frequency) {
 	uint32_t period = 1000000 / frequency;
 	uint32_t t_start = micros();
