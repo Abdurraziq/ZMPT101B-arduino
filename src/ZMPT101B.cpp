@@ -1,40 +1,64 @@
 #include "ZMPT101B.h"
 
-ZMPT101B::ZMPT101B(uint8_t _pin) {
-	pin = _pin;
-	sensitivity = 0.019;
+/// @brief ZMPT101B constructor
+/// @param pin analog pin that ZMPT101B connected to.
+/// @param frequency AC system frequency
+ZMPT101B::ZMPT101B(uint8_t pin, uint16_t frequency)
+{
+	this->pin = pin;
+	period = 1000000 / frequency;
+	pinMode(pin, INPUT);
 }
 
-int ZMPT101B::calibrate() {
-	uint16_t acc = 0;
-	for (int i = 0; i < 10; i++) {
-		acc += analogRead(pin);
-	}
-	zero = acc / 10;
-	return zero;
+/// @brief Set sensitivity
+/// @param value Sensitivity value
+void ZMPT101B::setSensitivity(float value)
+{
+	sensitivity = value;
 }
 
-void ZMPT101B::setZeroPoint(int _zero) {
-	zero = _zero;
-}
-
-void ZMPT101B::setSensitivity(float sens) {
-	sensitivity = sens;
-}
-
-float ZMPT101B::getVoltageAC(uint16_t frequency) {
-	uint32_t period = 1000000 / frequency;
+/// @brief Calculate zero point
+/// @return zero / center value
+int ZMPT101B::getZeroPoint()
+{
+	uint32_t Vsum = 0;
+	uint32_t measurements_count = 0;
 	uint32_t t_start = micros();
 
-	uint32_t Vsum = 0, measurements_count = 0;
-	int32_t Vnow;
-
-	while (micros() - t_start < period) {
-		Vnow = analogRead(pin) - zero;
-		Vsum += Vnow*Vnow;
+	while (micros() - t_start < period)
+	{
+		Vsum += analogRead(pin);
 		measurements_count++;
 	}
 
-	float Vrms = sqrt(Vsum / measurements_count) / ADC_SCALE * VREF / sensitivity;
-	return Vrms;
+	return Vsum / measurements_count;
+}
+
+/// @brief Calculate root mean square (RMS) of AC valtage
+/// @param loopCount Loop count to calculate
+/// @return root mean square (RMS) of AC valtage
+float ZMPT101B::getRmsVoltage(uint8_t loopCount)
+{
+	double readingVoltage = 0.0f;
+
+	for (uint8_t i = 0; i < loopCount; i++)
+	{
+		int zeroPoint = this->getZeroPoint();
+
+		int32_t Vnow = 0;
+		uint32_t Vsum = 0;
+		uint32_t measurements_count = 0;
+		uint32_t t_start = micros();
+
+		while (micros() - t_start < period)
+		{
+			Vnow = analogRead(pin) - zeroPoint;
+			Vsum += (Vnow * Vnow);
+			measurements_count++;
+		}
+
+		readingVoltage += sqrt(Vsum / measurements_count) / ADC_SCALE * VREF * sensitivity;
+	}
+
+	return readingVoltage / loopCount;
 }

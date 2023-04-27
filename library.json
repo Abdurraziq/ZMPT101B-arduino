@@ -1,8 +1,8 @@
 {
 	"name": "ZMPT101B",
 	"description": "An Arduino library to interact with the ZMPT101B.",
-	"keywords": "ZMPT101B, voltage measuring, rms, power monitoring",
-	"version": "0.0.1",
+	"keywords": "ZMPT101B, AC, voltage, rms",
+	"version": "1.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Abdurraziq/ZMPT101B-arduino"

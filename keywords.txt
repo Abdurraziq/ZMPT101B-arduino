@@ -3,18 +3,14 @@
 #######################################
 
 #######################################
-# Datatypes (KEYWORD1)
+# Datatypes     (KEYWORD1)
 #######################################
 
-ZMPT101B	KEYWORD1
-ZMPT101B_type	KEYWORD1
+ZMPT101B	    KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-calibrate	KEYWORD2
-setZeroPoint	KEYWORD2
 setSensitivity	KEYWORD2
-getVoltageDC	KEYWORD2
-getVoltageAC	KEYWORD2
+getRmsVoltage	KEYWORD2

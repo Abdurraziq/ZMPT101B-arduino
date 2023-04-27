@@ -1,103 +1,92 @@
 # ZMPT101B
 
-An Arduino library to interact with the [ZMPT101B](http://www.zeming-e.com/file/0_2013_10_18_093344.pdf), an active single phase AC voltage sensor module.
+An Arduino library to interact with the [ZMPT101B](http://www.zeming-e.com/file/0_2013_10_18_093344.pdf),
+an active single phase AC voltage sensor module.
 
-This library is based on [Ruslan Koptev](https://github.com/rkoptev) ACS712 current sensors library for Arduino <https://github.com/rkoptev/ACS712-arduino>. This library is modified so that it can be used with ZMPT101B voltage sensor with the same code principle.
+This library is based on [Ruslan Koptev](https://github.com/rkoptev) ACS712
+current sensors library for Arduino <https://github.com/rkoptev/ACS712-arduino>.
+This library is modified so that it can be used with ZMPT101B voltage sensor
+with the same code principle.
 
 ## Methods
 
-### **Constructor**
+### Constructor
 
 ```c++
-ZMPT101B(uint8_t _pin)
+ZMPT101B(uint8_t pin, uint16_t frequency = DEFAULT_FREQUENCY);
 ```
 
-Constructor has a parameters for analog input to which it is connected.
+Constructor has a parameters `pin` for analog input to tell where is connected
+and the `frequency` value of the AC voltage that the sensor will measure (by
+default 50.0Hz).
 
-### **getVoltagetAC()**
+### Reading RMS Voltage Value
 
 ```c++
-float getVoltageAC(uint16_t frequency )
+float getRmsVoltage(uint8_t loopCount = 1)
 ```
 
-This method allows you to measure AC voltage. Frequency is measured in Hz. By default frequency is set to 50 Hz. Method use the Root Mean Square technique for the measurement. The measurement itself takes time of one full period (1second / frequency). RMS method allow us to measure complex signals different from the perfect sine wave.
+This method allows us to obtain the root mean square (RMS) value of the voltage.
+By default this method will only calculate the RMS value of one period wave. If
+you want the calculation to be done over several periods you can specify how
+many iterations you want. Reading more than once will usually return a more
+precise value however, sometimes it will take longer.
 
-### **calibrate()**
+### Set Sensitivity
 
 ```c++
-int calibrate()
+void setSensitivity(float value)
 ```
 
-This method reads the current value of the sensor and sets it as a reference point of measurement, and then returns this value. By default, this parameter is equal to half of the maximum value on analog input - 512; however, sometimes this value may vary. It depends on the individual sensor, power issues etc… It is better to execute this method at the beginning of each program. Note that when performing this method, no current must flow through the sensor, and since this is not always possible - there is the following method:
-
-### **setZeroPoint()**
-
-```c++
-void setZeroPoint( int _zero )
-```
-
-This method sets the obtained value as a zero point for measurements. You can use the previous method once, in order to find out zero point of your sensor and then use this method in your code to set starting point without reading sensor.
-
-### **setSensitivity()**
-
-```c++
-void setSensitivity( float sens )
-```
-
-This method sets the sensitivity value of the sensor. This sensitivity value indicates how much the output voltage value read by the ADC is compared to the value of the measured voltage source. The default value is 0.001.
+This method sets the sensitivity value of the sensor. The Sensitivity is the
+ratio of the output voltage sensor (that read by the ADC) to the input voltage
+sensor. The default value of sensitivity is 500.0.
 
 ## Example
-
-This is an example of measuring electrical power using the zmpt101b sensor for voltage measurement and acs712 sensor for current measurements.
 
 ### Circuit
 
 ![circuit](/img/schematic.png)
 
-### Code
+⚠️ If you are using a board with a 3.3 Volt system you should connect VCC to 3.3
+Volt (eg ESP board family).
 
-This example code use this [ACS712 library for arduino](https://github.com/rkoptev/ACS712-arduino).
+### Steep
+
+#### 0. Make sure the output voltage from the sensor is not clipped and distorted
+
+Connect the sensor to the voltage source you are going to measure.
+
+Use the following code to observe the waveform from the ZMPT1b sensor output.
 
 ```c++
-#include "ZMPT101B.h"
-#include "ACS712.h"
-
-// ZMPT101B sensor connected to A0 pin of arduino
-ZMPT101B voltageSensor(A0);
-
-// 5 amps version sensor (ACS712_05B) connected to A1 pin of arduino
-ACS712 currentSensor(ACS712_05B, A1);
-
-void setup()
-{
-  Serial.begin(9600);
-
-  // calibrate() method calibrates zero point of sensor,
-  // It is not necessary, but may positively affect the accuracy
-  // Ensure that no current flows through the sensor at this moment
-  Serial.println("Calibrating... Ensure that no current flows through the sensor at this moment");
-  delay(100);
-  voltageSensor.calibrate();
-  currentSensor.calibrate();
-  Serial.println("Done!");
+void setup() {
+  Serial.begin(115200);
 }
 
-void loop()
-{
-  // To measure voltage/current we need to know the frequency of voltage/current
-  // By default 50Hz is used, but you can specify desired frequency
-  // as first argument to getVoltageAC and getCurrentAC() method, if necessary
-
-  float U = voltageSensor.getVoltageAC();
-  float I = currentSensor.getCurrentAC();
-
-  // To calculate the power we need voltage multiplied by current
-  float P = U * I;
-
-  Serial.println(String("U = ") + U + " V");
-  Serial.println(String("I = ") + I + " A");
-  Serial.println(String("P = ") + P + " Watts");
-
-  delay(1000);
+void loop() {
+  Serial.println(analogRead(A0));
+  delayMicroseconds(1000);
 }
 ```
+
+Upload code and open serial plotter.
+
+Rotate the trimpot on the sensor until the output is not clipped, distorted and
+safe enough.
+
+![Wave](/img/wave.png)
+
+#### 1. Determine the appropriate sensitivity value
+
+Open the [calibrate.ino](/examples/calibrate/calibrate.ino) example and change
+the `ACTUAL_VOLTAGE` value according to the actual AC voltage value (eg based on
+a measurement with a voltmeter or something else). Upload the code then open
+serial monitor. Wait until the `sensitivity` value is displayed and then copy it.
+
+#### 2. Start measurement
+
+Open the [simple_usage.ino](/examples/simple_usage/simple_usage.ino) example
+then change the `SENSITIVITY` value (seventh line) based on the value you got in
+the previous process. Upload the code then open the serial monitor to observe
+the displayed voltage value.
