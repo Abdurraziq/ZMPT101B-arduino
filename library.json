@@ -2,7 +2,7 @@
 	"name": "ZMPT101B",
 	"description": "An Arduino library to interact with the ZMPT101B.",
 	"keywords": "ZMPT101B, AC, voltage, rms",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Abdurraziq/ZMPT101B-arduino"
